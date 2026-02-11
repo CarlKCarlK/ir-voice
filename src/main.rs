@@ -10,9 +10,9 @@ use panic_probe as _;
 
 audio_player! {
     IrVoicePlayer {
-        din_pin: PIN_8,
-        bclk_pin: PIN_9,
-        lrc_pin: PIN_10,
+        data_pin: PIN_8,               // DIN
+        bit_clock_pin: PIN_9,          // BCLK
+        word_select_pin: PIN_10,       // LRC / LRCLK
         sample_rate_hz: VOICE_22050_HZ,
         max_volume: Volume::spinal_tap(11),
     }

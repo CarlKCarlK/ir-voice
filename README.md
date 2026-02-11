@@ -8,9 +8,9 @@ This project is scaffolded and ready to add runtime logic.
 
 Audio player wiring defaults in `src/main.rs`:
 
-- DIN -> GP8
-- BCLK -> GP9
-- LRC -> GP10
+- Data pin (`DIN`) -> GP8
+- Bit clock pin (`BCLK`) -> GP9
+- Word select pin (`LRC` / `LRCLK`) -> GP10
 
 ## Build and run
 
