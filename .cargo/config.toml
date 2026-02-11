@@ -1,0 +1,37 @@
+[env]
+DEFMT_LOG = "info"
+
+[alias]
+ir-voice = "run --release --target thumbv6m-none-eabi --no-default-features --features pico1"
+ir-voice-check = "check --release --target thumbv6m-none-eabi --no-default-features --features pico1"
+ir-voice-build = "build --release --target thumbv6m-none-eabi --no-default-features --features pico1"
+ir-voice-2 = "run --release --target thumbv8m.main-none-eabihf --no-default-features --features pico2"
+ir-voice-2-check = "check --release --target thumbv8m.main-none-eabihf --no-default-features --features pico2"
+ir-voice-2-build = "build --release --target thumbv8m.main-none-eabihf --no-default-features --features pico2"
+
+[target.thumbv6m-none-eabi]
+runner = "probe-rs run --chip=RP2040"
+rustflags = [
+  "-C",
+  "link-arg=-Tlink.x",
+  "-C",
+  "link-arg=-Tdefmt.x",
+  "-C",
+  "link-arg=--gc-sections",
+]
+
+[target.thumbv8m.main-none-eabihf]
+runner = "probe-rs run --chip=RP235x"
+rustflags = [
+  "-C",
+  "link-arg=-Tlink.x",
+  "-C",
+  "link-arg=-Tlink-rp.x",
+  "-C",
+  "link-arg=-Tdefmt.x",
+  "-C",
+  "link-arg=--gc-sections",
+]
+
+[build]
+target = "thumbv8m.main-none-eabihf"
