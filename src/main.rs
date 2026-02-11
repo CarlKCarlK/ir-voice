@@ -3,7 +3,7 @@
 
 use defmt::info;
 use defmt_rtt as _;
-use device_envoy::audio_player::{AtEnd, VOICE_22050_HZ, Volume, audio_clip, audio_player};
+use device_envoy::audio_player::{AtEnd, AudioClip, VOICE_22050_HZ, Volume, audio_clip, audio_player};
 use device_envoy::ir::{IrKepler, IrKeplerStatic, KeplerButton};
 use embassy_executor::Spawner;
 use panic_probe as _;
@@ -14,7 +14,7 @@ audio_player! {
         bclk_pin: PIN_9,
         lrc_pin: PIN_10,
         sample_rate_hz: VOICE_22050_HZ,
-        max_volume: Volume::percent(20),
+        max_volume: Volume::spinal_tap(11),
     }
 }
 
@@ -88,16 +88,40 @@ audio_clip! {
     }
 }
 
-static DIGIT0: Digit0::AudioClip = Digit0::audio_clip();
-static DIGIT1: Digit1::AudioClip = Digit1::audio_clip();
-static DIGIT2: Digit2::AudioClip = Digit2::audio_clip();
-static DIGIT3: Digit3::AudioClip = Digit3::audio_clip();
-static DIGIT4: Digit4::AudioClip = Digit4::audio_clip();
-static DIGIT5: Digit5::AudioClip = Digit5::audio_clip();
-static DIGIT6: Digit6::AudioClip = Digit6::audio_clip();
-static DIGIT7: Digit7::AudioClip = Digit7::audio_clip();
-static DIGIT8: Digit8::AudioClip = Digit8::audio_clip();
-static DIGIT9: Digit9::AudioClip = Digit9::audio_clip();
+static DIGITS: [&AudioClip<VOICE_22050_HZ>; 10] = [
+    &Digit0::audio_clip(),
+    &Digit1::audio_clip(),
+    &Digit2::audio_clip(),
+    &Digit3::audio_clip(),
+    &Digit4::audio_clip(),
+    &Digit5::audio_clip(),
+    &Digit6::audio_clip(),
+    &Digit7::audio_clip(),
+    &Digit8::audio_clip(),
+    &Digit9::audio_clip(),
+];
+
+const SPINAL_TAP_MIN: u8 = 0;
+const SPINAL_TAP_MAX: u8 = 11;
+const SPINAL_TAP_INIT: u8 = 5;
+const SPINAL_TAP_DELTA_UP: i8 = 1;
+const SPINAL_TAP_DELTA_DOWN: i8 = -1;
+
+fn apply_spinal_tap_delta(spinal_tap_level: u8, delta: i8) -> u8 {
+    assert!(delta == SPINAL_TAP_DELTA_DOWN || delta == SPINAL_TAP_DELTA_UP);
+    assert!(spinal_tap_level <= SPINAL_TAP_MAX);
+    if delta == SPINAL_TAP_DELTA_UP {
+        if spinal_tap_level < SPINAL_TAP_MAX {
+            spinal_tap_level + 1
+        } else {
+            SPINAL_TAP_MAX
+        }
+    } else if spinal_tap_level > SPINAL_TAP_MIN {
+        spinal_tap_level - 1
+    } else {
+        SPINAL_TAP_MIN
+    }
+}
 
 #[embassy_executor::main]
 async fn main(spawner: Spawner) -> ! {
@@ -110,59 +134,51 @@ async fn main(spawner: Spawner) -> ! {
 
     let ir_voice_player =
         IrVoicePlayer::new(p.PIN_8, p.PIN_9, p.PIN_10, p.PIO1, p.DMA_CH0, spawner).unwrap();
+    let mut spinal_tap_level = SPINAL_TAP_INIT;
+    let mut last_non_mute_spinal_tap_level = if SPINAL_TAP_INIT == SPINAL_TAP_MIN {
+        SPINAL_TAP_MAX
+    } else {
+        SPINAL_TAP_INIT
+    };
+    ir_voice_player.set_volume(Volume::spinal_tap(spinal_tap_level));
 
     info!("Audio startup check: speaking 0");
-    ir_voice_player.play([&DIGIT0], AtEnd::Stop);
+    ir_voice_player.play([DIGITS[0]], AtEnd::Stop);
 
     loop {
         let button = ir_kepler.wait_for_press().await;
-
         match button {
             KeplerButton::Num(number) => {
-                info!("IR mapped number: {}", number);
-                match number {
-                    0 => {
-                        info!("Playing digit 0");
-                        ir_voice_player.play([&DIGIT0], AtEnd::Stop);
-                    }
-                    1 => {
-                        info!("Playing digit 1");
-                        ir_voice_player.play([&DIGIT1], AtEnd::Stop);
-                    }
-                    2 => {
-                        info!("Playing digit 2");
-                        ir_voice_player.play([&DIGIT2], AtEnd::Stop);
-                    }
-                    3 => {
-                        info!("Playing digit 3");
-                        ir_voice_player.play([&DIGIT3], AtEnd::Stop);
-                    }
-                    4 => {
-                        info!("Playing digit 4");
-                        ir_voice_player.play([&DIGIT4], AtEnd::Stop);
-                    }
-                    5 => {
-                        info!("Playing digit 5");
-                        ir_voice_player.play([&DIGIT5], AtEnd::Stop);
-                    }
-                    6 => {
-                        info!("Playing digit 6");
-                        ir_voice_player.play([&DIGIT6], AtEnd::Stop);
-                    }
-                    7 => {
-                        info!("Playing digit 7");
-                        ir_voice_player.play([&DIGIT7], AtEnd::Stop);
-                    }
-                    8 => {
-                        info!("Playing digit 8");
-                        ir_voice_player.play([&DIGIT8], AtEnd::Stop);
-                    }
-                    9 => {
-                        info!("Playing digit 9");
-                        ir_voice_player.play([&DIGIT9], AtEnd::Stop);
-                    }
-                    _ => {}
+                info!("Playing digit {}", number);
+                if let Some(digit_audio_clip) = DIGITS.get(number as usize).copied() {
+                    ir_voice_player.play([digit_audio_clip], AtEnd::Stop);
                 }
+            }
+            KeplerButton::Mute => {
+                if spinal_tap_level == SPINAL_TAP_MIN {
+                    spinal_tap_level = last_non_mute_spinal_tap_level;
+                } else {
+                    last_non_mute_spinal_tap_level = spinal_tap_level;
+                    spinal_tap_level = SPINAL_TAP_MIN;
+                }
+                ir_voice_player.set_volume(Volume::spinal_tap(spinal_tap_level));
+                info!("Volume set to {}/11", spinal_tap_level);
+            }
+            KeplerButton::Minus => {
+                spinal_tap_level = apply_spinal_tap_delta(spinal_tap_level, SPINAL_TAP_DELTA_DOWN);
+                if spinal_tap_level > SPINAL_TAP_MIN {
+                    last_non_mute_spinal_tap_level = spinal_tap_level;
+                }
+                ir_voice_player.set_volume(Volume::spinal_tap(spinal_tap_level));
+                info!("Volume set to {}/11", spinal_tap_level);
+            }
+            KeplerButton::Plus => {
+                spinal_tap_level = apply_spinal_tap_delta(spinal_tap_level, SPINAL_TAP_DELTA_UP);
+                if spinal_tap_level > SPINAL_TAP_MIN {
+                    last_non_mute_spinal_tap_level = spinal_tap_level;
+                }
+                ir_voice_player.set_volume(Volume::spinal_tap(spinal_tap_level));
+                info!("Volume set to {}/11", spinal_tap_level);
             }
             _ => {
                 info!("IR mapped non-number button");
