@@ -4,8 +4,7 @@
 use defmt::info;
 use defmt_rtt as _;
 use device_envoy::audio_player::{
-    AtEnd, AudioClip, NARROWBAND_8000_HZ, VOICE_22050_HZ, Volume, audio_clip, audio_player,
-    resampled_type,
+    AtEnd, VOICE_22050_HZ, Volume, audio_clip, audio_player, resampled_type,
 };
 use device_envoy::ir::{IrKepler, IrKeplerStatic, KeplerButton};
 use embassy_executor::Spawner;
@@ -16,7 +15,7 @@ audio_player! {
         data_pin: PIN_8,
         bit_clock_pin: PIN_9,
         word_select_pin: PIN_10,
-        sample_rate_hz: NARROWBAND_8000_HZ,
+        sample_rate_hz: 10_000,
         pio: PIO1,
         max_volume: Volume::spinal_tap(11),
     }
@@ -92,20 +91,29 @@ audio_clip! {
     }
 }
 
-static DIGIT0_NARROWBAND: resampled_type!(Digit0, NARROWBAND_8000_HZ) =
+static DIGIT0_NARROWBAND: resampled_type!(Digit0, IrVoicePlayer::SAMPLE_RATE_HZ) =
     Digit0::audio_clip().with_resampled();
 
-static DIGITS: [&AudioClip<NARROWBAND_8000_HZ>; 10] = [
+static DIGITS: [&IrVoicePlayerAudioClip; 10] = [
     &DIGIT0_NARROWBAND,
-    &Digit1::audio_clip().with_resampled::<_, { Digit1::SAMPLE_COUNT }>(),
-    &Digit2::audio_clip().with_resampled::<_, { Digit2::SAMPLE_COUNT }>(),
-    &Digit3::audio_clip().with_resampled::<_, { Digit3::SAMPLE_COUNT }>(),
-    &Digit4::audio_clip().with_resampled::<_, { Digit4::SAMPLE_COUNT }>(),
-    &Digit5::audio_clip().with_resampled::<_, { Digit5::SAMPLE_COUNT }>(),
-    &Digit6::audio_clip().with_resampled::<_, { Digit6::SAMPLE_COUNT }>(),
-    &Digit7::audio_clip().with_resampled::<_, { Digit7::SAMPLE_COUNT }>(),
-    &Digit8::audio_clip().with_resampled::<_, { Digit8::SAMPLE_COUNT }>(),
-    &Digit9::audio_clip().with_resampled::<_, { Digit9::SAMPLE_COUNT }>(),
+    &Digit1::audio_clip()
+        .with_resampled::<_, { Digit1::resampled_sample_count(IrVoicePlayer::SAMPLE_RATE_HZ) }>(),
+    &Digit2::audio_clip()
+        .with_resampled::<_, { Digit2::resampled_sample_count(IrVoicePlayer::SAMPLE_RATE_HZ) }>(),
+    &Digit3::audio_clip()
+        .with_resampled::<_, { Digit3::resampled_sample_count(IrVoicePlayer::SAMPLE_RATE_HZ) }>(),
+    &Digit4::audio_clip()
+        .with_resampled::<_, { Digit4::resampled_sample_count(IrVoicePlayer::SAMPLE_RATE_HZ) }>(),
+    &Digit5::audio_clip()
+        .with_resampled::<_, { Digit5::resampled_sample_count(IrVoicePlayer::SAMPLE_RATE_HZ) }>(),
+    &Digit6::audio_clip()
+        .with_resampled::<_, { Digit6::resampled_sample_count(IrVoicePlayer::SAMPLE_RATE_HZ) }>(),
+    &Digit7::audio_clip()
+        .with_resampled::<_, { Digit7::resampled_sample_count(IrVoicePlayer::SAMPLE_RATE_HZ) }>(),
+    &Digit8::audio_clip()
+        .with_resampled::<_, { Digit8::resampled_sample_count(IrVoicePlayer::SAMPLE_RATE_HZ) }>(),
+    &Digit9::audio_clip()
+        .with_resampled::<_, { Digit9::resampled_sample_count(IrVoicePlayer::SAMPLE_RATE_HZ) }>(),
 ];
 
 const SPINAL_TAP_MIN: u8 = 0;
