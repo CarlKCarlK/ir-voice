@@ -3,17 +3,21 @@
 
 use defmt::info;
 use defmt_rtt as _;
-use device_envoy::audio_player::{AtEnd, AudioClip, VOICE_22050_HZ, Volume, audio_clip, audio_player};
+use device_envoy::audio_player::{
+    AtEnd, AudioClip, NARROWBAND_8000_HZ, VOICE_22050_HZ, Volume, audio_clip, audio_player,
+    resampled_type,
+};
 use device_envoy::ir::{IrKepler, IrKeplerStatic, KeplerButton};
 use embassy_executor::Spawner;
 use panic_probe as _;
 
 audio_player! {
     IrVoicePlayer {
-        data_pin: PIN_8,               // DIN
-        bit_clock_pin: PIN_9,          // BCLK
-        word_select_pin: PIN_10,       // LRC / LRCLK
-        sample_rate_hz: VOICE_22050_HZ,
+        data_pin: PIN_8,
+        bit_clock_pin: PIN_9,
+        word_select_pin: PIN_10,
+        sample_rate_hz: NARROWBAND_8000_HZ,
+        pio: PIO1,
         max_volume: Volume::spinal_tap(11),
     }
 }
@@ -88,17 +92,20 @@ audio_clip! {
     }
 }
 
-static DIGITS: [&AudioClip<VOICE_22050_HZ>; 10] = [
-    &Digit0::audio_clip(),
-    &Digit1::audio_clip(),
-    &Digit2::audio_clip(),
-    &Digit3::audio_clip(),
-    &Digit4::audio_clip(),
-    &Digit5::audio_clip(),
-    &Digit6::audio_clip(),
-    &Digit7::audio_clip(),
-    &Digit8::audio_clip(),
-    &Digit9::audio_clip(),
+static DIGIT0_NARROWBAND: resampled_type!(Digit0, NARROWBAND_8000_HZ) =
+    Digit0::audio_clip().with_resampled();
+
+static DIGITS: [&AudioClip<NARROWBAND_8000_HZ>; 10] = [
+    &DIGIT0_NARROWBAND,
+    &Digit1::audio_clip().with_resampled::<_, { Digit1::SAMPLE_COUNT }>(),
+    &Digit2::audio_clip().with_resampled::<_, { Digit2::SAMPLE_COUNT }>(),
+    &Digit3::audio_clip().with_resampled::<_, { Digit3::SAMPLE_COUNT }>(),
+    &Digit4::audio_clip().with_resampled::<_, { Digit4::SAMPLE_COUNT }>(),
+    &Digit5::audio_clip().with_resampled::<_, { Digit5::SAMPLE_COUNT }>(),
+    &Digit6::audio_clip().with_resampled::<_, { Digit6::SAMPLE_COUNT }>(),
+    &Digit7::audio_clip().with_resampled::<_, { Digit7::SAMPLE_COUNT }>(),
+    &Digit8::audio_clip().with_resampled::<_, { Digit8::SAMPLE_COUNT }>(),
+    &Digit9::audio_clip().with_resampled::<_, { Digit9::SAMPLE_COUNT }>(),
 ];
 
 const SPINAL_TAP_MIN: u8 = 0;
