@@ -99,8 +99,7 @@ pcm_clip! {
     }
 }
 
-// todo000 use adpcm_clip_from and make nicer (may no longer apply)
-const DIGITS: [&'static IrVoicePlayerPlayable; 10] = [
+const DIGITS: [& IrVoicePlayerPlayable; 10] = [
     &Digit0::adpcm_clip(),
     &Digit1::adpcm_clip(),
     &Digit2::adpcm_clip(),
