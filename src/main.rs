@@ -99,18 +99,18 @@ pcm_clip! {
     }
 }
 
-// todo00 `IrVoicePlayerAudioClipSource` us a trait and name is long.
-const DIGITS: [&'static IrVoicePlayerAudioClipSource; 10] = [
-    &Digit0::adpcm256_clip_from(Digit0::pcm_clip()),
-    &Digit1::pcm_clip(),
-    &Digit2::pcm_clip(),
-    &Digit3::pcm_clip(),
-    &Digit4::pcm_clip(),
-    &Digit5::pcm_clip(),
-    &Digit6::pcm_clip(),
-    &Digit7::pcm_clip(),
-    &Digit8::pcm_clip(),
-    &Digit9::pcm_clip(),
+// todo000 use adpcm_clip_from and make nicer (may no longer apply)
+const DIGITS: [&'static IrVoicePlayerPlayable; 10] = [
+    &Digit0::adpcm_clip(),
+    &Digit1::adpcm_clip(),
+    &Digit2::adpcm_clip(),
+    &Digit3::adpcm_clip(),
+    &Digit4::adpcm_clip(),
+    &Digit5::adpcm_clip(),
+    &Digit6::adpcm_clip(),
+    &Digit7::adpcm_clip(),
+    &Digit8::adpcm_clip(),
+    &Digit9::adpcm_clip(),
 ];
 
 const SPINAL_TAP_MIN: u8 = 0;
