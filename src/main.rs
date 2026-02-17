@@ -21,81 +21,81 @@ audio_player! {
 
 pcm_clip! {
     Digit0 {
+        file: "../data/audio/digits/0_22050.s16",
         source_sample_rate_hz: VOICE_22050_HZ,
         target_sample_rate_hz: IrVoicePlayer::SAMPLE_RATE_HZ,
-        file: "../data/audio/digits/0_22050.s16",
     }
 }
 
 pcm_clip! {
     Digit1 {
+        file: "../data/audio/digits/1_22050.s16",
         source_sample_rate_hz: VOICE_22050_HZ,
         target_sample_rate_hz: IrVoicePlayer::SAMPLE_RATE_HZ,
-        file: "../data/audio/digits/1_22050.s16",
     }
 }
 
 pcm_clip! {
     Digit2 {
+        file: "../data/audio/digits/2_22050.s16",
         source_sample_rate_hz: VOICE_22050_HZ,
         target_sample_rate_hz: IrVoicePlayer::SAMPLE_RATE_HZ,
-        file: "../data/audio/digits/2_22050.s16",
     }
 }
 
 pcm_clip! {
     Digit3 {
+        file: "../data/audio/digits/3_22050.s16",
         source_sample_rate_hz: VOICE_22050_HZ,
         target_sample_rate_hz: IrVoicePlayer::SAMPLE_RATE_HZ,
-        file: "../data/audio/digits/3_22050.s16",
     }
 }
 
 pcm_clip! {
     Digit4 {
+        file: "../data/audio/digits/4_22050.s16",
         source_sample_rate_hz: VOICE_22050_HZ,
         target_sample_rate_hz: IrVoicePlayer::SAMPLE_RATE_HZ,
-        file: "../data/audio/digits/4_22050.s16",
     }
 }
 
 pcm_clip! {
     Digit5 {
+        file: "../data/audio/digits/5_22050.s16",
         source_sample_rate_hz: VOICE_22050_HZ,
         target_sample_rate_hz: IrVoicePlayer::SAMPLE_RATE_HZ,
-        file: "../data/audio/digits/5_22050.s16",
     }
 }
 
 pcm_clip! {
     Digit6 {
+        file: "../data/audio/digits/6_22050.s16",
         source_sample_rate_hz: VOICE_22050_HZ,
         target_sample_rate_hz: IrVoicePlayer::SAMPLE_RATE_HZ,
-        file: "../data/audio/digits/6_22050.s16",
     }
 }
 
 pcm_clip! {
     Digit7 {
+        file: "../data/audio/digits/7_22050.s16",
         source_sample_rate_hz: VOICE_22050_HZ,
         target_sample_rate_hz: IrVoicePlayer::SAMPLE_RATE_HZ,
-        file: "../data/audio/digits/7_22050.s16",
     }
 }
 
 pcm_clip! {
     Digit8 {
+        file: "../data/audio/digits/8_22050.s16",
         source_sample_rate_hz: VOICE_22050_HZ,
         target_sample_rate_hz: IrVoicePlayer::SAMPLE_RATE_HZ,
-        file: "../data/audio/digits/8_22050.s16",
     }
 }
 
 pcm_clip! {
     Digit9 {
+        file: "../data/audio/digits/9_22050.s16",
         source_sample_rate_hz: VOICE_22050_HZ,
         target_sample_rate_hz: IrVoicePlayer::SAMPLE_RATE_HZ,
-        file: "../data/audio/digits/9_22050.s16",
     }
 }
 
